@@ -1,0 +1,73 @@
+<mxfile host="app.diagrams.net" agent="ChatGPT">
+  <diagram id="crm-architecture" name="CRM Lead Architecture">
+    <mxGraphModel dx="1717" dy="1038" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;" value="Automated CRM Lead Assignment &amp; Notification System" vertex="1">
+          <mxGeometry height="40" width="820" x="390" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="crm" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;fontStyle=1;" value="Close CRM&#xa;New Lead Created" vertex="1">
+          <mxGeometry height="80" width="180" x="30" y="235" as="geometry" />
+        </mxCell>
+        <mxCell id="api" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;fontStyle=1;" value="Amazon API Gateway&#xa;POST /crm" vertex="1">
+          <mxGeometry height="80" width="190" x="250" y="235" as="geometry" />
+        </mxCell>
+        <mxCell id="ingest" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontStyle=1;" value="Lambda 1&#xa;Webhook Ingestion&#xa;- validate/parse event&#xa;- extract lead_id" vertex="1">
+          <mxGeometry height="130" width="210" x="500" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="raws3" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;" value="Amazon S3&#xa;RAW Prefix&#xa;raw/crm_event_{lead_id}.json" vertex="1">
+          <mxGeometry height="105" width="220" x="830" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="sqs" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=15;fontStyle=1;" value="Amazon SQS&#xa;Lead Processing Queue&#xa;Delay = 10 minutes" vertex="1">
+          <mxGeometry height="95" width="220" x="790" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="processor" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontStyle=1;" value="Lambda 2&#xa;Lead Processor&#xa;- lookup&#xa;- enrich&#xa;- write output&#xa;- notify" vertex="1">
+          <mxGeometry height="145" width="210" x="1110" y="315" as="geometry" />
+        </mxCell>
+        <mxCell id="lookup" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;fontStyle=1;" value="Public S3 Lookup Bucket&#xa;dea-lead-owner&#xa;{lead_id}.json" vertex="1">
+          <mxGeometry height="105" width="230" x="1100" y="65" as="geometry" />
+        </mxCell>
+        <mxCell id="processed" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;" value="Amazon S3&#xa;PROCESSED Prefix&#xa;enriched lead JSON" vertex="1">
+          <mxGeometry height="105" width="190" x="1380" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="notify" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1;" value="Slack or Email&#xa;New Lead Alert&#xa;Name / ID / Date / Email / Owner / Funnel" vertex="1">
+          <mxGeometry height="115" width="210" x="1370" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="dlq" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;" value="SQS Dead-Letter Queue&#xa;Recommended for failed messages / retries" vertex="1">
+          <mxGeometry height="85" width="230" x="970" y="615" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="crm" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;" target="ingest">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="ingest" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;" target="raws3" value="1. Persist raw event">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="ingest" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;" target="sqs" value="2. Enqueue lead_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="sqs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;" target="processor" value="after 10 min">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="processor" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;" target="lookup" value="lookup by lead_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="processor" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;" target="processed" value="store enriched data">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="processor" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;" target="notify" value="send alert">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="sqs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#666666;" target="dlq" value="after max receive count">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OSnY0s-FrIOqUNsnLYEI-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Text" vertex="1">
+          <mxGeometry height="30" width="60" x="1520" y="140" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

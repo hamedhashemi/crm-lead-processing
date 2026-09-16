@@ -1,0 +1,22 @@
+{
+  "subscription_id": "whsub_test123",
+  "event": {
+    "id": "ev_test123",
+    "date_created": "2026-09-14T20:00:00.000000",
+    "date_updated": "2026-09-14T20:00:00.000000",
+    "object_type": "lead",
+    "object_id": "lead_test123",
+    "lead_id": "lead_test123",
+    "action": "created",
+    "changed_fields": [],
+    "data": {
+      "id": "lead_test123",
+      "display_name": "John Smith",
+      "date_created": "2026-09-14T20:00:00.000000+00:00",
+      "date_updated": "2026-09-14T20:00:00.000000+00:00",
+      "status_label": "Potential",
+      "custom.cf_funnel_test": "DE ACADEMY Direct VSL"
+    },
+    "previous_data": {}
+  }
+}
